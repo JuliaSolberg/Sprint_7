@@ -4,30 +4,23 @@ import io.qameta.allure.Description;
 import io.qameta.allure.Epic;
 import io.qameta.allure.Feature;
 import io.qameta.allure.Step;
-import io.restassured.RestAssured;
-import io.restassured.response.ValidatableResponse;
+import io.restassured.response.Response;
 import junitparams.JUnitParamsRunner;
 import junitparams.Parameters;
 import org.junit.After;
-import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import ru.yandex.praktikum.api.client.OrdersClient;
 import ru.yandex.praktikum.model.Order;
-
-import static io.restassured.RestAssured.given;
 import static org.hamcrest.CoreMatchers.equalTo;
 
 @Epic("API Tests")
 @Feature("Orders")
 @RunWith(JUnitParamsRunner.class)
-public class CreateOrderApiTest {
+public class CreateOrderApiTest extends BaseTest{
     private Order order;
     private int trackOrder;
-
-    @Before
-    public void setUp() {
-        RestAssured.baseURI = "https://qa-scooter.praktikum-services.ru";
-    }
+    private OrdersClient orderClient;
 
     @Step("Подготовка данных для создания заказа")
     public static Object[][] createOrderData() {
@@ -46,25 +39,16 @@ public class CreateOrderApiTest {
                 String address, String metroStation, String phone, int rentTime,
                 String deliveryDate, String comment, String[] color) {
         order = new Order(firstName,lastName,address,metroStation,phone,rentTime,deliveryDate,comment,color);
-        ValidatableResponse createOrderResponse = given().log().all()
-                .header("Content-type", "application/json")
-                .body(order)
-                .post("/api/v1/orders")
-                .then()
-                .statusCode(201);
-        trackOrder = createOrderResponse.extract().jsonPath().getInt("track");
-        System.out.println("Номер заказа: "+trackOrder);
-        createOrderResponse.assertThat().body("track",equalTo(trackOrder));
+
+        orderClient = new OrdersClient();
+        Response createOrderResponse = orderClient.createOrder(order);
+        trackOrder = orderClient.getOrderTrack(createOrderResponse);
+        createOrderResponse.then().body("track",equalTo(trackOrder));
     }
 
     @After
     @Step("Удаление тестового заказа")
     public void tearDown() {
-        ValidatableResponse deleteOrderResponse = given()
-                .header("Content-type", "application/json")
-                .param("track",trackOrder)
-                .put("/api/v1/orders/cancel")
-                .then()
-                .statusCode(200);
+        orderClient.cancelOrder(trackOrder);
     }
 }

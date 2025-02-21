@@ -3,9 +3,7 @@ package ru.yandex.praktikum;
 import io.qameta.allure.Epic;
 import io.qameta.allure.Feature;
 import io.qameta.allure.junit4.DisplayName;
-import io.restassured.RestAssured;
 import io.restassured.response.ValidatableResponse;
-import org.junit.Before;
 import org.junit.Test;
 import ru.yandex.praktikum.model.ListOfOrders;
 
@@ -18,11 +16,8 @@ import static org.hamcrest.Matchers.not;
 
 @Epic("API Tests")
 @Feature("Orders")
-public class GetListOfOrdersApiTest {
-    @Before
-    public void setUp() {
-        RestAssured.baseURI = "https://qa-scooter.praktikum-services.ru";
-    }
+public class GetListOfOrdersApiTest extends BaseTest {
+
     @Test
     @DisplayName("Получение списка заказов. Запрос на 10 доступных заказов возле метро Калужская")
     public void getListOfOrdersOk() {

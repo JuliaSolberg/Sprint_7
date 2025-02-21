@@ -20,6 +20,10 @@ public class Order {
     private String updatedAt;
     private int status;
 
+    public Order() {
+
+    }
+
     public Order(String firstName, String lastName, String address, String metroStation, String phone,
                  int rentTime, String deliveryDate, String comment, String[] color) {
         this.firstName = firstName;
@@ -31,6 +35,10 @@ public class Order {
         this.deliveryDate = deliveryDate;
         this.comment = comment;
         this.color = color;
+    }
+
+    public int getId() {
+        return id;
     }
 
     @Override
